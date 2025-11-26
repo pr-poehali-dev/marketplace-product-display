@@ -36,9 +36,9 @@ const ProductComparisonSection = ({ products }: ProductComparisonSectionProps) =
   };
 
   const marketplaceColors = {
-    ozon: 'bg-blue-500',
-    wb: 'bg-purple-500',
-    yandex: 'bg-orange-500'
+    ozon: 'bg-gray-800',
+    wb: 'bg-gray-700',
+    yandex: 'bg-gray-600'
   };
 
   const marketplaceNames = {
@@ -48,7 +48,7 @@ const ProductComparisonSection = ({ products }: ProductComparisonSectionProps) =
   };
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <div className="container">
         <div className="mb-8">
           <h3 className="text-3xl font-bold font-heading mb-2">Сравнение товаров</h3>

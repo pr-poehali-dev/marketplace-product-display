@@ -7,6 +7,7 @@ import ProductsSection from '@/components/ProductsSection';
 import ComparisonPostsSection from '@/components/ComparisonPostsSection';
 import ProductComparisonSection from '@/components/ProductComparisonSection';
 import ArticlesSection from '@/components/ArticlesSection';
+import PromocodesSection from '@/components/PromocodesSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
@@ -195,14 +196,14 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <Header />
       <HeroSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       
       <section className="py-8 px-4">
         <div className="container">
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto h-auto">
+            <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto h-auto">
               <TabsTrigger value="catalog" className="gap-2 py-3">
                 <Icon name="ShoppingBag" size={18} />
                 Каталог
@@ -210,6 +211,10 @@ const Index = () => {
               <TabsTrigger value="articles" className="gap-2 py-3">
                 <Icon name="Newspaper" size={18} />
                 Статьи
+              </TabsTrigger>
+              <TabsTrigger value="promocodes" className="gap-2 py-3">
+                <Icon name="Tag" size={18} />
+                Промокоды
               </TabsTrigger>
               <TabsTrigger value="comparison-posts" className="gap-2 py-3">
                 <Icon name="FileText" size={18} />
@@ -245,6 +250,10 @@ const Index = () => {
 
             <TabsContent value="articles" className="mt-0">
               <ArticlesSection />
+            </TabsContent>
+
+            <TabsContent value="promocodes" className="mt-0">
+              <PromocodesSection />
             </TabsContent>
 
             <TabsContent value="comparison-posts" className="mt-0">

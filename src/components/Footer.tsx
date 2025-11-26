@@ -7,11 +7,6 @@ const Footer = () => {
       <div className="container">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <img 
-              src="https://cdn.poehali.dev/files/b0e5bd94-3b85-434e-9a38-0badb842c232.jpg" 
-              alt="Shop Sage Logo"
-              className="w-8 h-8 object-contain"
-            />
             <span className="font-semibold">Shop Sage © 2024</span>
           </div>
           <p className="text-sm text-muted-foreground text-center">

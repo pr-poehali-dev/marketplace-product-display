@@ -93,7 +93,7 @@ const ArticlesSection = () => {
   };
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <div className="container">
         <div className="flex justify-between items-center mb-8">
           <div>

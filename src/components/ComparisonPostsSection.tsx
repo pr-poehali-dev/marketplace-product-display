@@ -119,7 +119,7 @@ const ComparisonPostsSection = () => {
   };
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16 px-4 bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30">
       <div className="container">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>

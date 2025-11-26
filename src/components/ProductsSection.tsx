@@ -56,7 +56,7 @@ const ProductsSection = ({
   openAddDialog
 }: ProductsSectionProps) => {
   return (
-    <section id="posts" className="py-16 px-4 bg-gray-50">
+    <section id="posts" className="py-16 px-4 bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30">
       <div className="container">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">

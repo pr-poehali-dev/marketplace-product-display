@@ -14,11 +14,10 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
       <div className="container">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
           <h2 className="text-5xl md:text-6xl font-bold font-heading text-primary leading-tight">
-            Все товары в одном месте
+            Shop Sage
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Находите лучшие предложения с Ozon, Wildberries и Яндекс.Маркет. 
-            Сравнивайте цены и выбирайте то, что нужно именно вам.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            ShopSage — это современная онлайн-платформа, предназначенная для предоставления широкого ассортимента товаров и услуг. Сайт ориентирован на удобство пользователей, предлагая интуитивно понятный интерфейс и разнообразные возможности для поиска и приобретения продукции на всех известных маркетплейсах ( Ozon, WB, Яндекс Маркет )
           </p>
           <div className="flex items-center gap-2 max-w-2xl mx-auto">
             <div className="relative flex-1">

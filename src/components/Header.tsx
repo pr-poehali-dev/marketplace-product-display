@@ -6,11 +6,6 @@ const Header = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-3">
-          <img 
-            src="https://cdn.poehali.dev/files/b0e5bd94-3b85-434e-9a38-0badb842c232.jpg" 
-            alt="Shop Sage Logo"
-            className="w-10 h-10 object-contain"
-          />
           <h1 className="text-2xl font-bold font-heading text-primary">
             Shop Sage
           </h1>
