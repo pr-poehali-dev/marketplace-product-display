@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ProductsSection from '@/components/ProductsSection';
+import ComparisonPostsSection from '@/components/ComparisonPostsSection';
+import ProductComparisonSection from '@/components/ProductComparisonSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
+import Icon from '@/components/ui/icon';
 
 const mockProducts: Product[] = [
   {
@@ -74,6 +78,7 @@ const Index = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [mainTab, setMainTab] = useState('catalog');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
@@ -192,25 +197,58 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <Header />
       <HeroSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      <ProductsSection
-        products={products}
-        filteredProducts={filteredProducts}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isDialogOpen={isDialogOpen}
-        setIsDialogOpen={setIsDialogOpen}
-        isEditMode={isEditMode}
-        deleteProductId={deleteProductId}
-        setDeleteProductId={setDeleteProductId}
-        newProduct={newProduct}
-        setNewProduct={setNewProduct}
-        toggleFavorite={toggleFavorite}
-        openEditDialog={openEditDialog}
-        addProduct={addProduct}
-        deleteProduct={deleteProduct}
-        resetForm={resetForm}
-        openAddDialog={openAddDialog}
-      />
+      
+      <section className="py-8 px-4">
+        <div className="container">
+          <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto h-auto">
+              <TabsTrigger value="catalog" className="gap-2 py-3">
+                <Icon name="ShoppingBag" size={18} />
+                Каталог товаров
+              </TabsTrigger>
+              <TabsTrigger value="comparison-posts" className="gap-2 py-3">
+                <Icon name="FileText" size={18} />
+                Посты со сравнениями
+              </TabsTrigger>
+              <TabsTrigger value="comparison" className="gap-2 py-3">
+                <Icon name="Scale" size={18} />
+                Сравнить товары
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="catalog" className="mt-0">
+              <ProductsSection
+                products={products}
+                filteredProducts={filteredProducts}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                isDialogOpen={isDialogOpen}
+                setIsDialogOpen={setIsDialogOpen}
+                isEditMode={isEditMode}
+                deleteProductId={deleteProductId}
+                setDeleteProductId={setDeleteProductId}
+                newProduct={newProduct}
+                setNewProduct={setNewProduct}
+                toggleFavorite={toggleFavorite}
+                openEditDialog={openEditDialog}
+                addProduct={addProduct}
+                deleteProduct={deleteProduct}
+                resetForm={resetForm}
+                openAddDialog={openAddDialog}
+              />
+            </TabsContent>
+
+            <TabsContent value="comparison-posts" className="mt-0">
+              <ComparisonPostsSection />
+            </TabsContent>
+
+            <TabsContent value="comparison" className="mt-0">
+              <ProductComparisonSection products={products} />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </section>
+
       <ContactSection />
       <Footer />
     </div>
