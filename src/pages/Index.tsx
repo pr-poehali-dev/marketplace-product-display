@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -90,6 +92,9 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<number | null>(null);
+  const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
   const { toast } = useToast();
   
   const [newProduct, setNewProduct] = useState({
@@ -117,14 +122,38 @@ const Index = () => {
       return;
     }
 
-    const product: Product = {
-      id: Math.max(...products.map(p => p.id), 0) + 1,
-      ...newProduct,
-      imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
-      isFavorite: false
-    };
+    if (isEditMode && editingProductId) {
+      setProducts(products.map(p => 
+        p.id === editingProductId 
+          ? { 
+              ...p, 
+              ...newProduct, 
+              imageUrl: newProduct.imageUrl || p.imageUrl 
+            } 
+          : p
+      ));
+      toast({
+        title: 'Успешно!',
+        description: 'Товар обновлён'
+      });
+    } else {
+      const product: Product = {
+        id: Math.max(...products.map(p => p.id), 0) + 1,
+        ...newProduct,
+        imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+        isFavorite: false
+      };
+      setProducts([product, ...products]);
+      toast({
+        title: 'Успешно!',
+        description: 'Товар добавлен в каталог'
+      });
+    }
 
-    setProducts([product, ...products]);
+    resetForm();
+  };
+
+  const resetForm = () => {
     setNewProduct({
       title: '',
       description: '',
@@ -134,10 +163,38 @@ const Index = () => {
       imageUrl: ''
     });
     setIsDialogOpen(false);
-    toast({
-      title: 'Успешно!',
-      description: 'Товар добавлен в каталог'
+    setIsEditMode(false);
+    setEditingProductId(null);
+  };
+
+  const openEditDialog = (product: Product) => {
+    setNewProduct({
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      marketplace: product.marketplace,
+      url: product.url,
+      imageUrl: product.imageUrl
     });
+    setEditingProductId(product.id);
+    setIsEditMode(true);
+    setIsDialogOpen(true);
+  };
+
+  const deleteProduct = () => {
+    if (deleteProductId) {
+      setProducts(products.filter(p => p.id !== deleteProductId));
+      toast({
+        title: 'Удалено',
+        description: 'Товар удалён из каталога'
+      });
+      setDeleteProductId(null);
+    }
+  };
+
+  const openAddDialog = () => {
+    resetForm();
+    setIsDialogOpen(true);
   };
 
   const filteredProducts = products.filter(product => {
@@ -236,18 +293,23 @@ const Index = () => {
                 <p className="text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                  setIsDialogOpen(open);
+                  if (!open) resetForm();
+                }}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+                    <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90" onClick={openAddDialog}>
                       <Icon name="Plus" size={16} className="mr-2" />
                       Добавить товар
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                      <DialogTitle className="text-2xl font-heading">Добавить новый товар</DialogTitle>
+                      <DialogTitle className="text-2xl font-heading">
+                        {isEditMode ? 'Редактировать товар' : 'Добавить новый товар'}
+                      </DialogTitle>
                       <DialogDescription>
-                        Заполните информацию о товаре с маркетплейса
+                        {isEditMode ? 'Измените информацию о товаре' : 'Заполните информацию о товаре с маркетплейса'}
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -324,12 +386,12 @@ const Index = () => {
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                      <Button variant="outline" onClick={resetForm}>
                         Отмена
                       </Button>
                       <Button onClick={addProduct} className="bg-gradient-to-r from-primary to-secondary">
                         <Icon name="Check" size={16} className="mr-2" />
-                        Добавить товар
+                        {isEditMode ? 'Сохранить изменения' : 'Добавить товар'}
                       </Button>
                     </DialogFooter>
                   </DialogContent>
@@ -361,16 +423,42 @@ const Index = () => {
                         alt={product.title}
                         className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
                       />
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className={`absolute top-2 right-2 bg-white/90 backdrop-blur hover:bg-white ${
-                          product.isFavorite ? 'text-red-500' : 'text-gray-400'
-                        }`}
-                        onClick={() => toggleFavorite(product.id)}
-                      >
-                        <Icon name="Heart" size={20} fill={product.isFavorite ? 'currentColor' : 'none'} />
-                      </Button>
+                      <div className="absolute top-2 right-2 flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`bg-white/90 backdrop-blur hover:bg-white ${
+                            product.isFavorite ? 'text-red-500' : 'text-gray-400'
+                          }`}
+                          onClick={() => toggleFavorite(product.id)}
+                        >
+                          <Icon name="Heart" size={20} fill={product.isFavorite ? 'currentColor' : 'none'} />
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="bg-white/90 backdrop-blur hover:bg-white"
+                            >
+                              <Icon name="MoreVertical" size={20} />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEditDialog(product)}>
+                              <Icon name="Pencil" size={16} className="mr-2" />
+                              Редактировать
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => setDeleteProductId(product.id)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Icon name="Trash2" size={16} className="mr-2" />
+                              Удалить
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                       <Badge className={`absolute top-2 left-2 ${marketplaceColors[product.marketplace]} text-white border-0`}>
                         {marketplaceNames[product.marketplace]}
                       </Badge>
