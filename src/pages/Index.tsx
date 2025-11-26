@@ -6,6 +6,7 @@ import HeroSection from '@/components/HeroSection';
 import ProductsSection from '@/components/ProductsSection';
 import ComparisonPostsSection from '@/components/ComparisonPostsSection';
 import ProductComparisonSection from '@/components/ProductComparisonSection';
+import ArticlesSection from '@/components/ArticlesSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
@@ -201,18 +202,22 @@ const Index = () => {
       <section className="py-8 px-4">
         <div className="container">
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto h-auto">
+            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto h-auto">
               <TabsTrigger value="catalog" className="gap-2 py-3">
                 <Icon name="ShoppingBag" size={18} />
-                Каталог товаров
+                Каталог
+              </TabsTrigger>
+              <TabsTrigger value="articles" className="gap-2 py-3">
+                <Icon name="Newspaper" size={18} />
+                Статьи
               </TabsTrigger>
               <TabsTrigger value="comparison-posts" className="gap-2 py-3">
                 <Icon name="FileText" size={18} />
-                Посты со сравнениями
+                Сравнения
               </TabsTrigger>
               <TabsTrigger value="comparison" className="gap-2 py-3">
                 <Icon name="Scale" size={18} />
-                Сравнить товары
+                Сравнить
               </TabsTrigger>
             </TabsList>
 
@@ -236,6 +241,10 @@ const Index = () => {
                 resetForm={resetForm}
                 openAddDialog={openAddDialog}
               />
+            </TabsContent>
+
+            <TabsContent value="articles" className="mt-0">
+              <ArticlesSection />
             </TabsContent>
 
             <TabsContent value="comparison-posts" className="mt-0">

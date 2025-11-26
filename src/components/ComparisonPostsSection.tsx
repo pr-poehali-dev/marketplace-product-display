@@ -97,10 +97,19 @@ const ComparisonPostsSection = () => {
     });
   };
 
+  const sharePost = (postId: number) => {
+    const url = `${window.location.origin}/#comparison-post-${postId}`;
+    navigator.clipboard.writeText(url);
+    toast({
+      title: 'Ссылка скопирована!',
+      description: 'Поделитесь постом с друзьями'
+    });
+  };
+
   const marketplaceColors = {
-    ozon: 'bg-blue-500',
-    wb: 'bg-purple-500',
-    yandex: 'bg-orange-500'
+    ozon: 'bg-gray-800',
+    wb: 'bg-gray-700',
+    yandex: 'bg-gray-600'
   };
 
   const marketplaceNames = {
@@ -119,7 +128,7 @@ const ComparisonPostsSection = () => {
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+              <Button>
                 <Icon name="Plus" size={16} className="mr-2" />
                 Создать пост
               </Button>
@@ -260,7 +269,7 @@ const ComparisonPostsSection = () => {
                 <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                   Отмена
                 </Button>
-                <Button onClick={addPost} className="bg-gradient-to-r from-primary to-secondary">
+                <Button onClick={addPost}>
                   <Icon name="Check" size={16} className="mr-2" />
                   Опубликовать пост
                 </Button>
@@ -271,7 +280,12 @@ const ComparisonPostsSection = () => {
 
         <div className="grid grid-cols-1 gap-6">
           {posts.map((post, index) => (
-            <Card key={post.id} className="animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
+            <Card 
+              key={post.id} 
+              id={`comparison-post-${post.id}`}
+              className="animate-fade-in" 
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
@@ -328,6 +342,13 @@ const ComparisonPostsSection = () => {
                     </Button>
                   )
                 ))}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => sharePost(post.id)}
+                >
+                  <Icon name="Share2" size={18} />
+                </Button>
               </CardFooter>
             </Card>
           ))}
