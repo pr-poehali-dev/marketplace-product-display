@@ -83,6 +83,14 @@ const ArticlesSection = () => {
     setIsDialogOpen(false);
   };
 
+  const deleteArticle = (articleId: number) => {
+    setArticles(articles.filter(article => article.id !== articleId));
+    toast({
+      title: 'Удалено',
+      description: 'Статья удалена'
+    });
+  };
+
   const shareArticle = (articleId: number) => {
     const url = `${window.location.origin}/#article-${articleId}`;
     navigator.clipboard.writeText(url);
@@ -188,14 +196,23 @@ const ArticlesSection = () => {
               <CardHeader>
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <CardTitle className="text-xl line-clamp-2">{article.title}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => shareArticle(article.id)}
-                    className="shrink-0"
-                  >
-                    <Icon name="Share2" size={18} />
-                  </Button>
+                  <div className="flex gap-1 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => shareArticle(article.id)}
+                    >
+                      <Icon name="Share2" size={18} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteArticle(article.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Icon name="Trash2" size={18} />
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Icon name="User" size={14} />

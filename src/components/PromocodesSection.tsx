@@ -97,6 +97,14 @@ const PromocodesSection = () => {
     setIsDialogOpen(false);
   };
 
+  const deletePromocode = (promocodeId: number) => {
+    setPromocodes(promocodes.filter(promo => promo.id !== promocodeId));
+    toast({
+      title: 'Удалено',
+      description: 'Промокод удалён'
+    });
+  };
+
   const copyPromocode = (code: string) => {
     navigator.clipboard.writeText(code);
     toast({
@@ -300,11 +308,23 @@ const PromocodesSection = () => {
               >
                 <CardHeader className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-xl">{promo.title}</CardTitle>
+                    <div className="flex-1">
+                      <CardTitle className="text-xl">{promo.title}</CardTitle>
+                    </div>
                     <div className="flex flex-col gap-2 items-end">
-                      <Badge className={`${marketplaceColors[promo.marketplace]} text-white border-0 shrink-0`}>
-                        {marketplaceNames[promo.marketplace]}
-                      </Badge>
+                      <div className="flex gap-1 items-center">
+                        <Badge className={`${marketplaceColors[promo.marketplace]} text-white border-0 shrink-0`}>
+                          {marketplaceNames[promo.marketplace]}
+                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-destructive hover:text-destructive"
+                          onClick={() => deletePromocode(promo.id)}
+                        >
+                          <Icon name="Trash2" size={16} />
+                        </Button>
+                      </div>
                       {isExpired && (
                         <Badge variant="destructive" className="shrink-0">
                           Истёк

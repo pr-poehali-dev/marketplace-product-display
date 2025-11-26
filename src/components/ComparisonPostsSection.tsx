@@ -97,6 +97,14 @@ const ComparisonPostsSection = () => {
     });
   };
 
+  const deletePost = (postId: number) => {
+    setPosts(posts.filter(post => post.id !== postId));
+    toast({
+      title: 'Удалено',
+      description: 'Пост со сравнением удалён'
+    });
+  };
+
   const sharePost = (postId: number) => {
     const url = `${window.location.origin}/#comparison-post-${postId}`;
     navigator.clipboard.writeText(url);
@@ -292,10 +300,20 @@ const ComparisonPostsSection = () => {
                     <CardTitle className="text-2xl mb-2">{post.title}</CardTitle>
                     <CardDescription>{post.description}</CardDescription>
                   </div>
-                  <Badge variant="secondary" className="ml-4">
-                    <Icon name="Calendar" size={14} className="mr-1" />
-                    {new Date(post.createdAt).toLocaleDateString('ru-RU')}
-                  </Badge>
+                  <div className="flex gap-2 ml-4">
+                    <Badge variant="secondary">
+                      <Icon name="Calendar" size={14} className="mr-1" />
+                      {new Date(post.createdAt).toLocaleDateString('ru-RU')}
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deletePost(post.id)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Icon name="Trash2" size={18} />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
