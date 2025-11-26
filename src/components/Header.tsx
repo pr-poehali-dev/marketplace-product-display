@@ -11,7 +11,7 @@ const Header = () => {
             alt="Shop Sage Logo"
             className="w-10 h-10 object-contain"
           />
-          <h1 className="text-2xl font-bold font-heading bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold font-heading text-primary">
             Shop Sage
           </h1>
         </div>

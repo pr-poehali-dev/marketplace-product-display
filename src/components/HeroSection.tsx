@@ -13,7 +13,7 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
     <section id="home" className="py-20 px-4">
       <div className="container">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <h2 className="text-5xl md:text-6xl font-bold font-heading bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
+          <h2 className="text-5xl md:text-6xl font-bold font-heading text-primary leading-tight">
             Все товары в одном месте
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -31,7 +31,7 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
                 className="pl-10 h-12 text-base"
               />
             </div>
-            <Button size="lg" className="h-12 px-8 bg-gradient-to-r from-primary to-accent hover:opacity-90">
+            <Button size="lg" className="h-12 px-8">
               Найти
             </Button>
           </div>

@@ -25,9 +25,9 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, index, onToggleFavorite, onEdit, onDelete }: ProductCardProps) => {
   const marketplaceColors = {
-    ozon: 'bg-blue-500',
-    wb: 'bg-purple-500',
-    yandex: 'bg-orange-500'
+    ozon: 'bg-gray-800',
+    wb: 'bg-gray-700',
+    yandex: 'bg-gray-600'
   };
 
   const marketplaceNames = {

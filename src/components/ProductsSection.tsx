@@ -56,7 +56,7 @@ const ProductsSection = ({
   openAddDialog
 }: ProductsSectionProps) => {
   return (
-    <section id="posts" className="py-16 px-4 bg-white/50">
+    <section id="posts" className="py-16 px-4 bg-gray-50">
       <div className="container">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -70,7 +70,7 @@ const ProductsSection = ({
                 if (!open) resetForm();
               }}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90" onClick={openAddDialog}>
+                  <Button onClick={openAddDialog}>
                     <Icon name="Plus" size={16} className="mr-2" />
                     Добавить товар
                   </Button>
@@ -161,7 +161,7 @@ const ProductsSection = ({
                     <Button variant="outline" onClick={resetForm}>
                       Отмена
                     </Button>
-                    <Button onClick={addProduct} className="bg-gradient-to-r from-primary to-secondary">
+                    <Button onClick={addProduct}>
                       <Icon name="Check" size={16} className="mr-2" />
                       {isEditMode ? 'Сохранить изменения' : 'Добавить товар'}
                     </Button>
