@@ -4,6 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 
 interface Product {
@@ -84,11 +89,55 @@ const Index = () => {
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
+  
+  const [newProduct, setNewProduct] = useState({
+    title: '',
+    description: '',
+    price: '',
+    marketplace: 'ozon' as 'ozon' | 'wb' | 'yandex',
+    url: '',
+    imageUrl: ''
+  });
 
   const toggleFavorite = (id: number) => {
     setProducts(products.map(p => 
       p.id === id ? { ...p, isFavorite: !p.isFavorite } : p
     ));
+  };
+
+  const addProduct = () => {
+    if (!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.url) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пожалуйста, заполните все обязательные поля',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const product: Product = {
+      id: Math.max(...products.map(p => p.id), 0) + 1,
+      ...newProduct,
+      imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop',
+      isFavorite: false
+    };
+
+    setProducts([product, ...products]);
+    setNewProduct({
+      title: '',
+      description: '',
+      price: '',
+      marketplace: 'ozon',
+      url: '',
+      imageUrl: ''
+    });
+    setIsDialogOpen(false);
+    toast({
+      title: 'Успешно!',
+      description: 'Товар добавлен в каталог'
+    });
   };
 
   const filteredProducts = products.filter(product => {
@@ -186,16 +235,116 @@ const Index = () => {
                 <h3 className="text-3xl font-bold font-heading mb-2">Товары</h3>
                 <p className="text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
               </div>
-              <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto">
-                <TabsTrigger value="all" className="gap-2">
-                  <Icon name="Grid3x3" size={16} />
-                  Все товары
-                </TabsTrigger>
-                <TabsTrigger value="favorites" className="gap-2">
-                  <Icon name="Heart" size={16} />
-                  Избранное ({products.filter(p => p.isFavorite).length})
-                </TabsTrigger>
-              </TabsList>
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90">
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Добавить товар
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-heading">Добавить новый товар</DialogTitle>
+                      <DialogDescription>
+                        Заполните информацию о товаре с маркетплейса
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Название товара *</Label>
+                        <Input
+                          id="title"
+                          placeholder="Например: Беспроводные наушники"
+                          value={newProduct.title}
+                          onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Описание *</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Краткое описание товара, его особенности..."
+                          value={newProduct.description}
+                          onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                          rows={3}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="price">Цена *</Label>
+                          <Input
+                            id="price"
+                            placeholder="2 490 ₽"
+                            value={newProduct.price}
+                            onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="marketplace">Маркетплейс *</Label>
+                          <Select
+                            value={newProduct.marketplace}
+                            onValueChange={(value: 'ozon' | 'wb' | 'yandex') => 
+                              setNewProduct({ ...newProduct, marketplace: value })
+                            }
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ozon">Ozon</SelectItem>
+                              <SelectItem value="wb">Wildberries</SelectItem>
+                              <SelectItem value="yandex">Яндекс Маркет</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="url">Ссылка на товар *</Label>
+                        <Input
+                          id="url"
+                          type="url"
+                          placeholder="https://ozon.ru/product/..."
+                          value={newProduct.url}
+                          onChange={(e) => setNewProduct({ ...newProduct, url: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="imageUrl">Ссылка на изображение (опционально)</Label>
+                        <Input
+                          id="imageUrl"
+                          type="url"
+                          placeholder="https://example.com/image.jpg"
+                          value={newProduct.imageUrl}
+                          onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Если не указать, будет использовано изображение по умолчанию
+                        </p>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                        Отмена
+                      </Button>
+                      <Button onClick={addProduct} className="bg-gradient-to-r from-primary to-secondary">
+                        <Icon name="Check" size={16} className="mr-2" />
+                        Добавить товар
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto">
+                  <TabsTrigger value="all" className="gap-2">
+                    <Icon name="Grid3x3" size={16} />
+                    Все товары
+                  </TabsTrigger>
+                  <TabsTrigger value="favorites" className="gap-2">
+                    <Icon name="Heart" size={16} />
+                    Избранное ({products.filter(p => p.isFavorite).length})
+                  </TabsTrigger>
+                </TabsList>
+              </div>
             </div>
 
             <TabsContent value={activeTab} className="mt-0">
