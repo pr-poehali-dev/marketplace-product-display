@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import AuthDialog from '@/components/AuthDialog';
+import AdminSettings from '@/components/AdminSettings';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ProductsSection from '@/components/ProductsSection';
@@ -89,8 +90,15 @@ const Index = () => {
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const [isAdminSettingsOpen, setIsAdminSettingsOpen] = useState(false);
   const { toast } = useToast();
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
+  
+  const trackView = (section: string) => {
+    const key = `${section}_views`;
+    const currentViews = parseInt(localStorage.getItem(key) || '0');
+    localStorage.setItem(key, (currentViews + 1).toString());
+  };
   
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -203,6 +211,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <AuthDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
+      <AdminSettings isOpen={isAdminSettingsOpen} onClose={() => setIsAdminSettingsOpen(false)} />
       <Header />
       {!isAuthenticated && (
         <div className="fixed top-20 right-4 z-50">
@@ -219,9 +228,15 @@ const Index = () => {
             <span className="font-medium">{user?.email}</span>
             {isAdmin && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded">Админ</span>}
           </div>
+          {isAdmin && (
+            <Button onClick={() => setIsAdminSettingsOpen(true)} size="sm" variant="outline" className="gap-2">
+              <Icon name="Settings" size={16} />
+              <span className="hidden sm:inline">Настройки</span>
+            </Button>
+          )}
           <Button onClick={logout} size="sm" variant="outline" className="gap-2">
             <Icon name="LogOut" size={16} />
-            Выйти
+            <span className="hidden sm:inline">Выйти</span>
           </Button>
         </div>
       )}
@@ -229,23 +244,61 @@ const Index = () => {
       
       <section className="py-8 px-4">
         <div className="container">
-          <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
+          <Tabs value={mainTab} onValueChange={(value) => {
+            setMainTab(value);
+            if (value === 'catalog') trackView('catalog');
+            if (value === 'articles') trackView('articles');
+            if (value === 'promocodes') trackView('promocodes');
+            if (value === 'comparison-posts') trackView('comparisons');
+          }} className="w-full">
             <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto h-auto">
-              <TabsTrigger value="catalog" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
-                <Icon name="ShoppingBag" size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Каталог</span>
+              <TabsTrigger value="catalog" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Icon name="ShoppingBag" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span className="hidden sm:inline">Каталог</span>
+                </div>
+                {isAdmin && (
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                    <Icon name="Eye" size={10} className="sm:w-3 sm:h-3" />
+                    {localStorage.getItem('catalog_views') || '0'}
+                  </span>
+                )}
               </TabsTrigger>
-              <TabsTrigger value="articles" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
-                <Icon name="Newspaper" size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Статьи</span>
+              <TabsTrigger value="articles" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Icon name="Newspaper" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span className="hidden sm:inline">Статьи</span>
+                </div>
+                {isAdmin && (
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                    <Icon name="Eye" size={10} className="sm:w-3 sm:h-3" />
+                    {localStorage.getItem('articles_views') || '0'}
+                  </span>
+                )}
               </TabsTrigger>
-              <TabsTrigger value="promocodes" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
-                <Icon name="Tag" size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Промокоды</span>
+              <TabsTrigger value="promocodes" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Icon name="Tag" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span className="hidden sm:inline">Промокоды</span>
+                </div>
+                {isAdmin && (
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                    <Icon name="Eye" size={10} className="sm:w-3 sm:h-3" />
+                    {localStorage.getItem('promocodes_views') || '0'}
+                  </span>
+                )}
               </TabsTrigger>
-              <TabsTrigger value="comparison-posts" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
-                <Icon name="FileText" size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden sm:inline">Сравнения</span>
+              <TabsTrigger value="comparison-posts" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Icon name="FileText" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                  <span className="hidden sm:inline">Сравнения</span>
+                </div>
+                {isAdmin && (
+                  <span className="text-[10px] sm:text-xs text-muted-foreground flex items-center gap-1">
+                    <Icon name="Eye" size={10} className="sm:w-3 sm:h-3" />
+                    {localStorage.getItem('comparisons_views') || '0'}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger value="comparison" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
                 <Icon name="Scale" size={16} className="sm:w-[18px] sm:h-[18px]" />
