@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import Icon from '@/components/ui/icon';
 
 export interface Promocode {
@@ -48,6 +49,7 @@ const PromocodesSection = () => {
   const [promocodes, setPromocodes] = useState<Promocode[]>(mockPromocodes);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filterMarketplace, setFilterMarketplace] = useState<'all' | 'ozon' | 'wb' | 'yandex'>('all');
+  const { isAuthenticated } = useAuth();
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
   const { toast } = useToast();
 
@@ -149,20 +151,21 @@ const PromocodesSection = () => {
     <section className="py-16 px-4 bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container">
         <div className="flex flex-col gap-6 mb-8">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-              <h3 className="text-3xl font-bold font-heading mb-2">Промокоды и скидки</h3>
-              <p className="text-muted-foreground">
+              <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Промокоды и скидки</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Найдено промокодов: {filteredPromocodes.length}
               </p>
             </div>
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Icon name="Plus" size={16} className="mr-2" />
-                  Добавить промокод
-                </Button>
-              </DialogTrigger>
+            {isAuthenticated && (
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="w-full sm:w-auto">
+                    <Icon name="Plus" size={16} className="mr-2" />
+                    Добавить промокод
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-heading">Новый промокод</DialogTitle>
@@ -316,14 +319,16 @@ const PromocodesSection = () => {
                         <Badge className={`${marketplaceColors[promo.marketplace]} text-white border-0 shrink-0`}>
                           {marketplaceNames[promo.marketplace]}
                         </Badge>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 text-destructive hover:text-destructive"
-                          onClick={() => deletePromocode(promo.id)}
-                        >
-                          <Icon name="Trash2" size={16} />
-                        </Button>
+                        {isAuthenticated && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-destructive hover:text-destructive"
+                            onClick={() => deletePromocode(promo.id)}
+                          >
+                            <Icon name="Trash2" size={16} />
+                          </Button>
+                        )}
                       </div>
                       {isExpired && (
                         <Badge variant="destructive" className="shrink-0">

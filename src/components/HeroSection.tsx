@@ -10,41 +10,41 @@ interface HeroSectionProps {
 
 const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
   return (
-    <section id="home" className="py-20 px-4">
+    <section id="home" className="py-12 sm:py-20 px-4">
       <div className="container">
-        <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <h2 className="text-5xl md:text-6xl font-bold font-heading text-primary leading-tight">
+        <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8 animate-fade-in">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-primary leading-tight">
             Shop Sage
           </h2>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
             ShopSage — это современная онлайн-платформа, предназначенная для предоставления широкого ассортимента товаров и услуг. Сайт ориентирован на удобство пользователей, предлагая интуитивно понятный интерфейс и разнообразные возможности для поиска и приобретения продукции на всех известных маркетплейсах ( Ozon, WB, Яндекс Маркет )
           </p>
-          <div className="flex items-center gap-2 max-w-2xl mx-auto">
-            <div className="relative flex-1">
+          <div className="flex flex-col sm:flex-row items-center gap-2 max-w-2xl mx-auto">
+            <div className="relative flex-1 w-full">
               <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
               <Input
                 type="text"
-                placeholder="Поиск товаров по названию или описанию..."
+                placeholder="Поиск товаров..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-12 text-base"
+                className="pl-10 h-12 text-sm sm:text-base"
               />
             </div>
-            <Button size="lg" className="h-12 px-8">
+            <Button size="lg" className="h-12 px-6 sm:px-8 w-full sm:w-auto">
               Найти
             </Button>
           </div>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Badge variant="secondary" className="text-sm px-4 py-2">
-              <Icon name="Package" size={16} className="mr-2" />
+          <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap px-4">
+            <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
+              <Icon name="Package" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               1000+ товаров
             </Badge>
-            <Badge variant="secondary" className="text-sm px-4 py-2">
-              <Icon name="Store" size={16} className="mr-2" />
+            <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
+              <Icon name="Store" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               3 маркетплейса
             </Badge>
-            <Badge variant="secondary" className="text-sm px-4 py-2">
-              <Icon name="Zap" size={16} className="mr-2" />
+            <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
+              <Icon name="Zap" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               Быстрый поиск
             </Badge>
           </div>

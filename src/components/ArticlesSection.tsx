@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import Icon from '@/components/ui/icon';
 
 export interface Article {
@@ -35,6 +36,7 @@ const ArticlesSection = () => {
   const [articles, setArticles] = useState<Article[]>(mockArticles);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const [newArticle, setNewArticle] = useState({
     title: '',
@@ -103,18 +105,19 @@ const ArticlesSection = () => {
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <div className="container">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
-            <h3 className="text-3xl font-bold font-heading mb-2">Статьи о товарах</h3>
-            <p className="text-muted-foreground">Полезные обзоры и советы по выбору товаров</p>
+            <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Статьи о товарах</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">Полезные обзоры и советы по выбору товаров</p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Icon name="Plus" size={16} className="mr-2" />
-                Добавить статью
-              </Button>
-            </DialogTrigger>
+          {isAuthenticated && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Icon name="Plus" size={16} className="mr-2" />
+                  Добавить статью
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-heading">Новая статья</DialogTitle>
@@ -204,14 +207,16 @@ const ArticlesSection = () => {
                     >
                       <Icon name="Share2" size={18} />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deleteArticle(article.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Icon name="Trash2" size={18} />
-                    </Button>
+                    {isAuthenticated && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteArticle(article.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Icon name="Trash2" size={18} />
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">

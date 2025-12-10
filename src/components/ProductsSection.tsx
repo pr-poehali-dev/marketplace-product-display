@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import ProductCard, { Product } from './ProductCard';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProductsSectionProps {
   products: Product[];
@@ -55,26 +56,29 @@ const ProductsSection = ({
   resetForm,
   openAddDialog
 }: ProductsSectionProps) => {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <section id="posts" className="py-16 px-4 bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30">
       <div className="container">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
             <div>
-              <h3 className="text-3xl font-bold font-heading mb-2">Товары</h3>
-              <p className="text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
+              <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Товары</h3>
+              <p className="text-sm sm:text-base text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <Dialog open={isDialogOpen} onOpenChange={(open) => {
-                setIsDialogOpen(open);
-                if (!open) resetForm();
-              }}>
-                <DialogTrigger asChild>
-                  <Button onClick={openAddDialog}>
-                    <Icon name="Plus" size={16} className="mr-2" />
-                    Добавить товар
-                  </Button>
-                </DialogTrigger>
+              {isAuthenticated && (
+                <Dialog open={isDialogOpen} onOpenChange={(open) => {
+                  setIsDialogOpen(open);
+                  if (!open) resetForm();
+                }}>
+                  <DialogTrigger asChild>
+                    <Button onClick={openAddDialog} size="sm" className="w-full sm:w-auto">
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Добавить товар
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle className="text-2xl font-heading">

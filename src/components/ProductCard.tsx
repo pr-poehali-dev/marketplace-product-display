@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Product {
   id: number;
@@ -24,6 +25,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, index, onToggleFavorite, onEdit, onDelete }: ProductCardProps) => {
+  const { isAuthenticated } = useAuth();
+  
   const marketplaceColors = {
     ozon: 'bg-gray-800',
     wb: 'bg-gray-700',
@@ -58,30 +61,32 @@ const ProductCard = ({ product, index, onToggleFavorite, onEdit, onDelete }: Pro
           >
             <Icon name="Heart" size={20} fill={product.isFavorite ? 'currentColor' : 'none'} />
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="bg-white/90 backdrop-blur hover:bg-white"
-              >
-                <Icon name="MoreVertical" size={20} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => onEdit(product)}>
-                <Icon name="Pencil" size={16} className="mr-2" />
-                Редактировать
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => onDelete(product.id)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Icon name="Trash2" size={16} className="mr-2" />
-                Удалить
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {isAuthenticated && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-white/90 backdrop-blur hover:bg-white"
+                >
+                  <Icon name="MoreVertical" size={20} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onEdit(product)}>
+                  <Icon name="Pencil" size={16} className="mr-2" />
+                  Редактировать
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => onDelete(product.id)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Icon name="Trash2" size={16} className="mr-2" />
+                  Удалить
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
         <Badge className={`absolute top-2 left-2 ${marketplaceColors[product.marketplace]} text-white border-0`}>
           {marketplaceNames[product.marketplace]}

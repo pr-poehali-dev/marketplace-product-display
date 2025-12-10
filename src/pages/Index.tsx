@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginDialog from '@/components/LoginDialog';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ProductsSection from '@/components/ProductsSection';
@@ -85,7 +88,9 @@ const Index = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated, logout } = useAuth();
   
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -197,32 +202,49 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
+      <LoginDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
       <Header />
+      {!isAuthenticated && (
+        <div className="fixed top-20 right-4 z-50">
+          <Button onClick={() => setIsLoginDialogOpen(true)} size="sm" variant="outline" className="gap-2">
+            <Icon name="Lock" size={16} />
+            Войти
+          </Button>
+        </div>
+      )}
+      {isAuthenticated && (
+        <div className="fixed top-20 right-4 z-50">
+          <Button onClick={logout} size="sm" variant="outline" className="gap-2">
+            <Icon name="LogOut" size={16} />
+            Выйти
+          </Button>
+        </div>
+      )}
       <HeroSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       
       <section className="py-8 px-4">
         <div className="container">
           <Tabs value={mainTab} onValueChange={setMainTab} className="w-full">
             <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto h-auto">
-              <TabsTrigger value="catalog" className="gap-2 py-3">
-                <Icon name="ShoppingBag" size={18} />
-                Каталог
+              <TabsTrigger value="catalog" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="ShoppingBag" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Каталог</span>
               </TabsTrigger>
-              <TabsTrigger value="articles" className="gap-2 py-3">
-                <Icon name="Newspaper" size={18} />
-                Статьи
+              <TabsTrigger value="articles" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="Newspaper" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Статьи</span>
               </TabsTrigger>
-              <TabsTrigger value="promocodes" className="gap-2 py-3">
-                <Icon name="Tag" size={18} />
-                Промокоды
+              <TabsTrigger value="promocodes" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="Tag" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Промокоды</span>
               </TabsTrigger>
-              <TabsTrigger value="comparison-posts" className="gap-2 py-3">
-                <Icon name="FileText" size={18} />
-                Сравнения
+              <TabsTrigger value="comparison-posts" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="FileText" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Сравнения</span>
               </TabsTrigger>
-              <TabsTrigger value="comparison" className="gap-2 py-3">
-                <Icon name="Scale" size={18} />
-                Сравнить
+              <TabsTrigger value="comparison" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="Scale" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Сравнить</span>
               </TabsTrigger>
             </TabsList>
 

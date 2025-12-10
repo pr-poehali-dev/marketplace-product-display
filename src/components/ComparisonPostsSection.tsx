@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface ComparisonPost {
   id: number;
@@ -55,6 +56,7 @@ const ComparisonPostsSection = () => {
   const [posts, setPosts] = useState<ComparisonPost[]>(mockPosts);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
 
   const [newPost, setNewPost] = useState({
     title: '',
@@ -131,16 +133,17 @@ const ComparisonPostsSection = () => {
       <div className="container">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
-            <h3 className="text-3xl font-bold font-heading mb-2">Посты со сравнениями</h3>
-            <p className="text-muted-foreground">Создавайте детальные сравнения товаров</p>
+            <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Посты со сравнениями</h3>
+            <p className="text-sm sm:text-base text-muted-foreground">Создавайте детальные сравнения товаров</p>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Icon name="Plus" size={16} className="mr-2" />
-                Создать пост
-              </Button>
-            </DialogTrigger>
+          {isAuthenticated && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm" className="w-full sm:w-auto">
+                  <Icon name="Plus" size={16} className="mr-2" />
+                  Создать пост
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-heading">Создать пост со сравнением</DialogTitle>
@@ -295,24 +298,26 @@ const ComparisonPostsSection = () => {
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <CardHeader>
-                <div className="flex justify-between items-start">
+                <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                   <div className="flex-1">
-                    <CardTitle className="text-2xl mb-2">{post.title}</CardTitle>
-                    <CardDescription>{post.description}</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl mb-2">{post.title}</CardTitle>
+                    <CardDescription className="text-sm">{post.description}</CardDescription>
                   </div>
-                  <div className="flex gap-2 ml-4">
-                    <Badge variant="secondary">
+                  <div className="flex gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                    <Badge variant="secondary" className="text-xs">
                       <Icon name="Calendar" size={14} className="mr-1" />
                       {new Date(post.createdAt).toLocaleDateString('ru-RU')}
                     </Badge>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => deletePost(post.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Icon name="Trash2" size={18} />
-                    </Button>
+                    {isAuthenticated && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deletePost(post.id)}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Icon name="Trash2" size={18} />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardHeader>
