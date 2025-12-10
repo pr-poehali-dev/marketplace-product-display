@@ -36,7 +36,7 @@ const ArticlesSection = () => {
   const [articles, setArticles] = useState<Article[]>(mockArticles);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
 
   const [newArticle, setNewArticle] = useState({
     title: '',
@@ -110,7 +110,7 @@ const ArticlesSection = () => {
             <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Статьи о товарах</h3>
             <p className="text-sm sm:text-base text-muted-foreground">Полезные обзоры и советы по выбору товаров</p>
           </div>
-          {isAuthenticated && (
+          {isAdmin && (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="w-full sm:w-auto">
@@ -208,7 +208,7 @@ const ArticlesSection = () => {
                     >
                       <Icon name="Share2" size={18} />
                     </Button>
-                    {isAuthenticated && (
+                    {isAdmin && (
                       <Button
                         variant="ghost"
                         size="icon"

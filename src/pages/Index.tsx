@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
-import LoginDialog from '@/components/LoginDialog';
+import AuthDialog from '@/components/AuthDialog';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import ProductsSection from '@/components/ProductsSection';
@@ -90,7 +90,7 @@ const Index = () => {
   const [deleteProductId, setDeleteProductId] = useState<number | null>(null);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, user, logout } = useAuth();
   
   const [newProduct, setNewProduct] = useState({
     title: '',
@@ -202,18 +202,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
-      <LoginDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
+      <AuthDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
       <Header />
       {!isAuthenticated && (
         <div className="fixed top-20 right-4 z-50">
           <Button onClick={() => setIsLoginDialogOpen(true)} size="sm" variant="outline" className="gap-2">
-            <Icon name="Lock" size={16} />
+            <Icon name="User" size={16} />
             Войти
           </Button>
         </div>
       )}
       {isAuthenticated && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed top-20 right-4 z-50 flex gap-2 items-center">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-secondary rounded-md text-sm">
+            <Icon name={isAdmin ? "Shield" : "User"} size={16} />
+            <span className="font-medium">{user?.email}</span>
+            {isAdmin && <span className="text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded">Админ</span>}
+          </div>
           <Button onClick={logout} size="sm" variant="outline" className="gap-2">
             <Icon name="LogOut" size={16} />
             Выйти

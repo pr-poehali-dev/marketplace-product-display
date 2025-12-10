@@ -56,7 +56,7 @@ const ProductsSection = ({
   resetForm,
   openAddDialog
 }: ProductsSectionProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   
   return (
     <section id="posts" className="py-16 px-4 bg-gradient-to-br from-purple-50/30 via-white to-blue-50/30">
@@ -68,7 +68,7 @@ const ProductsSection = ({
               <p className="text-sm sm:text-base text-muted-foreground">Найдено товаров: {filteredProducts.length}</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              {isAuthenticated && (
+              {isAdmin && (
                 <Dialog open={isDialogOpen} onOpenChange={(open) => {
                   setIsDialogOpen(open);
                   if (!open) resetForm();

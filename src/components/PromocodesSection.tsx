@@ -49,7 +49,7 @@ const PromocodesSection = () => {
   const [promocodes, setPromocodes] = useState<Promocode[]>(mockPromocodes);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [filterMarketplace, setFilterMarketplace] = useState<'all' | 'ozon' | 'wb' | 'yandex'>('all');
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
   const { toast } = useToast();
 
@@ -158,7 +158,7 @@ const PromocodesSection = () => {
                 Найдено промокодов: {filteredPromocodes.length}
               </p>
             </div>
-            {isAuthenticated && (
+            {isAdmin && (
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button size="sm" className="w-full sm:w-auto">
@@ -320,7 +320,7 @@ const PromocodesSection = () => {
                         <Badge className={`${marketplaceColors[promo.marketplace]} text-white border-0 shrink-0`}>
                           {marketplaceNames[promo.marketplace]}
                         </Badge>
-                        {isAuthenticated && (
+                        {isAdmin && (
                           <Button
                             variant="ghost"
                             size="icon"

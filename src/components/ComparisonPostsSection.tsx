@@ -56,7 +56,7 @@ const ComparisonPostsSection = () => {
   const [posts, setPosts] = useState<ComparisonPost[]>(mockPosts);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
 
   const [newPost, setNewPost] = useState({
     title: '',
@@ -136,7 +136,7 @@ const ComparisonPostsSection = () => {
             <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Посты со сравнениями</h3>
             <p className="text-sm sm:text-base text-muted-foreground">Создавайте детальные сравнения товаров</p>
           </div>
-          {isAuthenticated && (
+          {isAdmin && (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm" className="w-full sm:w-auto">
@@ -309,7 +309,7 @@ const ComparisonPostsSection = () => {
                       <Icon name="Calendar" size={14} className="mr-1" />
                       {new Date(post.createdAt).toLocaleDateString('ru-RU')}
                     </Badge>
-                    {isAuthenticated && (
+                    {isAdmin && (
                       <Button
                         variant="ghost"
                         size="icon"
