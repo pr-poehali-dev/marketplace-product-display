@@ -172,6 +172,7 @@ const ProductsSection = ({
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+              )}
               <TabsList className="grid w-full sm:w-auto grid-cols-2 h-auto">
                 <TabsTrigger value="all" className="gap-2">
                   <Icon name="Grid3x3" size={16} />

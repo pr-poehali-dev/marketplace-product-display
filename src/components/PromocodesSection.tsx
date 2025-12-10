@@ -259,6 +259,7 @@ const PromocodesSection = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+          )}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
