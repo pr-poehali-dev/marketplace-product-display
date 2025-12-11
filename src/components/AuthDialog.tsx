@@ -119,7 +119,7 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
                 type="email"
                 value={loginEmail}
                 onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="admin@shop.com"
+                placeholder="Введите email"
               />
             </div>
             <div className="space-y-2">
@@ -133,9 +133,7 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
                 placeholder="Введите пароль"
               />
             </div>
-            <div className="text-xs text-muted-foreground bg-secondary/50 p-3 rounded">
-              <strong>Админ:</strong> admin@shop.com / admin2024
-            </div>
+
             <DialogFooter>
               <Button variant="outline" onClick={onClose}>
                 Отмена

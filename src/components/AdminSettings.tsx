@@ -73,7 +73,7 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
       return;
     }
 
-    if (user?.email === 'admin@shop.com') {
+    if (user?.email === 'SharaShopSage.com') {
       toast({
         title: 'Внимание',
         description: 'Пароль главного админа нельзя изменить через интерфейс',
@@ -175,7 +175,7 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
               </CardContent>
             </Card>
 
-            {user?.email !== 'admin@shop.com' && (
+            {user?.email !== 'SharaShopSage.com' && (
               <Card>
                 <CardHeader>
                   <CardTitle>Сменить пароль</CardTitle>

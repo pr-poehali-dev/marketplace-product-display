@@ -13,6 +13,7 @@ import ProductComparisonSection from '@/components/ProductComparisonSection';
 import ArticlesSection from '@/components/ArticlesSection';
 import PromocodesSection from '@/components/PromocodesSection';
 import ContactSection from '@/components/ContactSection';
+import ContactsSection from '@/components/ContactsSection';
 import Footer from '@/components/Footer';
 import { Product } from '@/components/ProductCard';
 import Icon from '@/components/ui/icon';
@@ -251,7 +252,7 @@ const Index = () => {
             if (value === 'promocodes') trackView('promocodes');
             if (value === 'comparison-posts') trackView('comparisons');
           }} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 max-w-4xl mx-auto h-auto">
+            <TabsList className="grid w-full grid-cols-6 max-w-5xl mx-auto h-auto">
               <TabsTrigger value="catalog" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm flex flex-col sm:flex-row items-center">
                 <div className="flex items-center gap-1 sm:gap-2">
                   <Icon name="ShoppingBag" size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -304,6 +305,10 @@ const Index = () => {
                 <Icon name="Scale" size={16} className="sm:w-[18px] sm:h-[18px]" />
                 <span className="hidden sm:inline">Сравнить</span>
               </TabsTrigger>
+              <TabsTrigger value="contacts" className="gap-1 sm:gap-2 py-2 sm:py-3 text-xs sm:text-sm">
+                <Icon name="MessageCircle" size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden sm:inline">Контакты</span>
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="catalog" className="mt-0">
@@ -342,6 +347,10 @@ const Index = () => {
 
             <TabsContent value="comparison" className="mt-0">
               <ProductComparisonSection products={products} />
+            </TabsContent>
+
+            <TabsContent value="contacts" className="mt-0">
+              <ContactsSection />
             </TabsContent>
           </Tabs>
         </div>

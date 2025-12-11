@@ -16,7 +16,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_EMAIL = 'SharaShopSage';
+const ADMIN_EMAIL = 'SharaShopSage.com';
 const ADMIN_PASSWORD = '495812sss041124';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
