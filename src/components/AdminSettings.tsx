@@ -7,8 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+import { Switch } from '@/components/ui/switch';
 
 interface AdminSettingsProps {
   isOpen: boolean;
@@ -27,6 +29,7 @@ interface UsersStorage {
 
 const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const [users, setUsers] = useState<UsersStorage>({});
   
@@ -148,8 +151,9 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
         </DialogHeader>
 
         <Tabs defaultValue="account" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="account">Аккаунт</TabsTrigger>
+            <TabsTrigger value="appearance">Внешний вид</TabsTrigger>
             <TabsTrigger value="users">Пользователи</TabsTrigger>
             <TabsTrigger value="stats">Статистика</TabsTrigger>
           </TabsList>
@@ -226,6 +230,30 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
                   <Icon name="LogOut" size={16} className="mr-2" />
                   Выйти из аккаунта
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="appearance" className="space-y-4 mt-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Тема сайта</CardTitle>
+                <CardDescription>Выберите светлую или тёмную тему оформления</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Icon name={theme === 'dark' ? 'Moon' : 'Sun'} size={20} />
+                    <div>
+                      <p className="font-medium">{theme === 'dark' ? 'Тёмная тема' : 'Светлая тема'}</p>
+                      <p className="text-sm text-muted-foreground">Текущая тема оформления</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={theme === 'dark'}
+                    onCheckedChange={toggleTheme}
+                  />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

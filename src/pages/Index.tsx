@@ -210,7 +210,7 @@ const Index = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <AuthDialog isOpen={isLoginDialogOpen} onClose={() => setIsLoginDialogOpen(false)} />
       <AdminSettings isOpen={isAdminSettingsOpen} onClose={() => setIsAdminSettingsOpen(false)} />
       <Header />

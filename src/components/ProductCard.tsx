@@ -28,9 +28,21 @@ const ProductCard = ({ product, index, onToggleFavorite, onEdit, onDelete }: Pro
   const { isAdmin } = useAuth();
   
   const marketplaceColors = {
-    ozon: 'bg-gray-800',
-    wb: 'bg-gray-700',
-    yandex: 'bg-gray-600'
+    ozon: 'bg-blue-500',
+    wb: 'bg-purple-500',
+    yandex: 'bg-yellow-500'
+  };
+
+  const marketplaceBgColors = {
+    ozon: 'bg-blue-50 dark:bg-blue-950/30',
+    wb: 'bg-purple-50 dark:bg-purple-950/30',
+    yandex: 'bg-yellow-50 dark:bg-yellow-950/30'
+  };
+
+  const marketplaceBorderColors = {
+    ozon: 'border-blue-200 dark:border-blue-800',
+    wb: 'border-purple-200 dark:border-purple-800',
+    yandex: 'border-yellow-200 dark:border-yellow-800'
   };
 
   const marketplaceNames = {
@@ -41,7 +53,7 @@ const ProductCard = ({ product, index, onToggleFavorite, onEdit, onDelete }: Pro
 
   return (
     <Card 
-      className="group overflow-hidden hover:shadow-xl transition-all duration-300 animate-scale-in border-2 hover:border-primary/20"
+      className={`group overflow-hidden hover:shadow-xl transition-all duration-300 animate-scale-in border-2 ${marketplaceBgColors[product.marketplace]} ${marketplaceBorderColors[product.marketplace]}`}
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="relative overflow-hidden">
