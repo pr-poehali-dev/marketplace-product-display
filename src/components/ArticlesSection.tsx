@@ -44,6 +44,7 @@ const ArticlesSection = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const { isAdmin } = useAuth();
 
@@ -152,6 +153,71 @@ const ArticlesSection = () => {
     });
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пожалуйста, выберите изображение',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Ошибка',
+        description: 'Размер файла не должен превышать 5MB',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        
+        const response = await fetch('https://functions.poehali.dev/0ef92614-8878-4eba-8d5c-99df6a2c1ef0', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            image: base64String,
+            filename: file.name
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setNewArticle({ ...newArticle, imageUrl: data.url });
+          toast({
+            title: 'Успешно!',
+            description: 'Изображение загружено'
+          });
+        } else {
+          throw new Error(data.error || 'Ошибка загрузки');
+        }
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось загрузить изображение',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const shareArticle = (articleId: number) => {
     const url = `${window.location.origin}/#article-${articleId}`;
     navigator.clipboard.writeText(url);
@@ -225,14 +291,45 @@ const ArticlesSection = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="article-image">Ссылка на изображение</Label>
+                  <Label htmlFor="article-image-upload">Загрузить изображение</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="article-image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                      className="cursor-pointer"
+                    />
+                    {isUploading && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Icon name="Loader2" size={16} className="animate-spin" />
+                        Загрузка...
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Максимальный размер: 5MB. Форматы: JPG, PNG, GIF, WebP
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="article-image-url">Или укажите ссылку на изображение</Label>
                   <Input
-                    id="article-image"
+                    id="article-image-url"
                     type="url"
                     placeholder="https://example.com/image.jpg"
                     value={newArticle.imageUrl}
                     onChange={(e) => setNewArticle({ ...newArticle, imageUrl: e.target.value })}
                   />
+                  {newArticle.imageUrl && (
+                    <div className="mt-2">
+                      <img 
+                        src={newArticle.imageUrl} 
+                        alt="Preview" 
+                        className="w-full h-32 object-cover rounded-md"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="article-link">Ссылка на товар/сайт (опционально)</Label>
