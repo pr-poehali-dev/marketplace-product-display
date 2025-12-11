@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,8 @@ export interface Article {
   author: string;
   tags: string[];
   imageUrl: string;
+  productLink?: string;
+  linkText?: string;
   createdAt: string;
 }
 
@@ -33,7 +36,11 @@ const mockArticles: Article[] = [
 ];
 
 const ArticlesSection = () => {
-  const [articles, setArticles] = useState<Article[]>(mockArticles);
+  const navigate = useNavigate();
+  const [articles, setArticles] = useState<Article[]>(() => {
+    const saved = localStorage.getItem('articles');
+    return saved ? JSON.parse(saved) : mockArticles;
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
@@ -45,7 +52,9 @@ const ArticlesSection = () => {
     content: '',
     author: '',
     tags: '',
-    imageUrl: ''
+    imageUrl: '',
+    productLink: '',
+    linkText: ''
   });
 
   const addArticle = () => {
@@ -59,7 +68,7 @@ const ArticlesSection = () => {
     }
 
     if (isEditMode && editingArticleId) {
-      setArticles(articles.map(a => 
+      const updatedArticles = articles.map(a => 
         a.id === editingArticleId 
           ? {
               ...a,
@@ -67,10 +76,14 @@ const ArticlesSection = () => {
               content: newArticle.content,
               author: newArticle.author,
               tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
-              imageUrl: newArticle.imageUrl || a.imageUrl
+              imageUrl: newArticle.imageUrl || a.imageUrl,
+              productLink: newArticle.productLink,
+              linkText: newArticle.linkText
             }
           : a
-      ));
+      );
+      setArticles(updatedArticles);
+      localStorage.setItem('articles', JSON.stringify(updatedArticles));
       toast({
         title: 'Успешно!',
         description: 'Статья обновлена'
@@ -83,10 +96,14 @@ const ArticlesSection = () => {
         author: newArticle.author,
         tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
         imageUrl: newArticle.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop',
+        productLink: newArticle.productLink,
+        linkText: newArticle.linkText,
         createdAt: new Date().toISOString().split('T')[0]
       };
 
-      setArticles([article, ...articles]);
+      const updatedArticles = [article, ...articles];
+      setArticles(updatedArticles);
+      localStorage.setItem('articles', JSON.stringify(updatedArticles));
       toast({
         title: 'Успешно!',
         description: 'Статья опубликована'
@@ -101,7 +118,9 @@ const ArticlesSection = () => {
       content: '',
       author: '',
       tags: '',
-      imageUrl: ''
+      imageUrl: '',
+      productLink: '',
+      linkText: ''
     });
     setIsDialogOpen(false);
     setIsEditMode(false);
@@ -114,7 +133,9 @@ const ArticlesSection = () => {
       content: article.content,
       author: article.author,
       tags: article.tags.join(', '),
-      imageUrl: article.imageUrl
+      imageUrl: article.imageUrl,
+      productLink: article.productLink || '',
+      linkText: article.linkText || ''
     });
     setEditingArticleId(article.id);
     setIsEditMode(true);
@@ -122,7 +143,9 @@ const ArticlesSection = () => {
   };
 
   const deleteArticle = (articleId: number) => {
-    setArticles(articles.filter(article => article.id !== articleId));
+    const updatedArticles = articles.filter(article => article.id !== articleId);
+    setArticles(updatedArticles);
+    localStorage.setItem('articles', JSON.stringify(updatedArticles));
     toast({
       title: 'Удалено',
       description: 'Статья удалена'
@@ -211,6 +234,28 @@ const ArticlesSection = () => {
                     onChange={(e) => setNewArticle({ ...newArticle, imageUrl: e.target.value })}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="article-link">Ссылка на товар/сайт (опционально)</Label>
+                  <Input
+                    id="article-link"
+                    type="url"
+                    placeholder="https://example.com/product"
+                    value={newArticle.productLink}
+                    onChange={(e) => setNewArticle({ ...newArticle, productLink: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="article-link-text">Текст кнопки ссылки (опционально)</Label>
+                  <Input
+                    id="article-link-text"
+                    placeholder="Перейти к товару"
+                    value={newArticle.linkText}
+                    onChange={(e) => setNewArticle({ ...newArticle, linkText: e.target.value })}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Если не указано, будет "Перейти к товару"
+                  </p>
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={resetForm}>Отмена</Button>
@@ -229,8 +274,9 @@ const ArticlesSection = () => {
             <Card 
               key={article.id} 
               id={`article-${article.id}`}
-              className="overflow-hidden hover:shadow-lg transition-all animate-fade-in"
+              className="overflow-hidden hover:shadow-lg transition-all animate-fade-in cursor-pointer"
               style={{ animationDelay: `${index * 100}ms` }}
+              onClick={() => navigate(`/article/${article.id}`)}
             >
               <img 
                 src={article.imageUrl} 
@@ -244,7 +290,10 @@ const ArticlesSection = () => {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => shareArticle(article.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        shareArticle(article.id);
+                      }}
                     >
                       <Icon name="Share2" size={18} />
                     </Button>
@@ -253,14 +302,20 @@ const ArticlesSection = () => {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => openEditDialog(article)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditDialog(article);
+                          }}
                         >
                           <Icon name="Pencil" size={18} />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => deleteArticle(article.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteArticle(article.id);
+                          }}
                           className="text-destructive hover:text-destructive"
                         >
                           <Icon name="Trash2" size={18} />
