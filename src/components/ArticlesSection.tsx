@@ -35,6 +35,8 @@ const mockArticles: Article[] = [
 const ArticlesSection = () => {
   const [articles, setArticles] = useState<Article[]>(mockArticles);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingArticleId, setEditingArticleId] = useState<number | null>(null);
   const { toast } = useToast();
   const { isAdmin } = useAuth();
 
@@ -56,21 +58,40 @@ const ArticlesSection = () => {
       return;
     }
 
-    const article: Article = {
-      id: Math.max(...articles.map(a => a.id), 0) + 1,
-      title: newArticle.title,
-      content: newArticle.content,
-      author: newArticle.author,
-      tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
-      imageUrl: newArticle.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop',
-      createdAt: new Date().toISOString().split('T')[0]
-    };
+    if (isEditMode && editingArticleId) {
+      setArticles(articles.map(a => 
+        a.id === editingArticleId 
+          ? {
+              ...a,
+              title: newArticle.title,
+              content: newArticle.content,
+              author: newArticle.author,
+              tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
+              imageUrl: newArticle.imageUrl || a.imageUrl
+            }
+          : a
+      ));
+      toast({
+        title: 'Успешно!',
+        description: 'Статья обновлена'
+      });
+    } else {
+      const article: Article = {
+        id: Math.max(...articles.map(a => a.id), 0) + 1,
+        title: newArticle.title,
+        content: newArticle.content,
+        author: newArticle.author,
+        tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
+        imageUrl: newArticle.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop',
+        createdAt: new Date().toISOString().split('T')[0]
+      };
 
-    setArticles([article, ...articles]);
-    toast({
-      title: 'Успешно!',
-      description: 'Статья опубликована'
-    });
+      setArticles([article, ...articles]);
+      toast({
+        title: 'Успешно!',
+        description: 'Статья опубликована'
+      });
+    }
     resetForm();
   };
 
@@ -83,6 +104,21 @@ const ArticlesSection = () => {
       imageUrl: ''
     });
     setIsDialogOpen(false);
+    setIsEditMode(false);
+    setEditingArticleId(null);
+  };
+
+  const openEditDialog = (article: Article) => {
+    setNewArticle({
+      title: article.title,
+      content: article.content,
+      author: article.author,
+      tags: article.tags.join(', '),
+      imageUrl: article.imageUrl
+    });
+    setEditingArticleId(article.id);
+    setIsEditMode(true);
+    setIsDialogOpen(true);
   };
 
   const deleteArticle = (articleId: number) => {
@@ -120,8 +156,12 @@ const ArticlesSection = () => {
               </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-heading">Новая статья</DialogTitle>
-                <DialogDescription>Создайте статью о товаре или категории</DialogDescription>
+                <DialogTitle className="text-2xl font-heading">
+                  {isEditMode ? 'Редактировать статью' : 'Новая статья'}
+                </DialogTitle>
+                <DialogDescription>
+                  {isEditMode ? 'Измените информацию о статье' : 'Создайте статью о товаре или категории'}
+                </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="space-y-2">
@@ -176,7 +216,7 @@ const ArticlesSection = () => {
                 <Button variant="outline" onClick={resetForm}>Отмена</Button>
                 <Button onClick={addArticle}>
                   <Icon name="Check" size={16} className="mr-2" />
-                  Опубликовать
+                  {isEditMode ? 'Сохранить изменения' : 'Опубликовать'}
                 </Button>
               </DialogFooter>
             </DialogContent>
@@ -209,14 +249,23 @@ const ArticlesSection = () => {
                       <Icon name="Share2" size={18} />
                     </Button>
                     {isAdmin && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteArticle(article.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Icon name="Trash2" size={18} />
-                      </Button>
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openEditDialog(article)}
+                        >
+                          <Icon name="Pencil" size={18} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteArticle(article.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Icon name="Trash2" size={18} />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

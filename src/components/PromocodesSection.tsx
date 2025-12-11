@@ -48,6 +48,8 @@ const mockPromocodes: Promocode[] = [
 const PromocodesSection = () => {
   const [promocodes, setPromocodes] = useState<Promocode[]>(mockPromocodes);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingPromocodeId, setEditingPromocodeId] = useState<number | null>(null);
   const [filterMarketplace, setFilterMarketplace] = useState<'all' | 'ozon' | 'wb' | 'yandex'>('all');
   const { isAdmin } = useAuth();
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'expired'>('all');
@@ -73,16 +75,28 @@ const PromocodesSection = () => {
       return;
     }
 
-    const promocode: Promocode = {
-      id: Math.max(...promocodes.map(p => p.id), 0) + 1,
-      ...newPromocode
-    };
+    if (isEditMode && editingPromocodeId) {
+      setPromocodes(promocodes.map(p => 
+        p.id === editingPromocodeId 
+          ? { ...p, ...newPromocode }
+          : p
+      ));
+      toast({
+        title: 'Успешно!',
+        description: 'Промокод обновлён'
+      });
+    } else {
+      const promocode: Promocode = {
+        id: Math.max(...promocodes.map(p => p.id), 0) + 1,
+        ...newPromocode
+      };
 
-    setPromocodes([promocode, ...promocodes]);
-    toast({
-      title: 'Успешно!',
-      description: 'Промокод добавлен'
-    });
+      setPromocodes([promocode, ...promocodes]);
+      toast({
+        title: 'Успешно!',
+        description: 'Промокод добавлен'
+      });
+    }
     resetForm();
   };
 
@@ -97,6 +111,23 @@ const PromocodesSection = () => {
       url: ''
     });
     setIsDialogOpen(false);
+    setIsEditMode(false);
+    setEditingPromocodeId(null);
+  };
+
+  const openEditDialog = (promocode: Promocode) => {
+    setNewPromocode({
+      code: promocode.code,
+      title: promocode.title,
+      description: promocode.description,
+      discount: promocode.discount,
+      marketplace: promocode.marketplace,
+      validUntil: promocode.validUntil,
+      url: promocode.url
+    });
+    setEditingPromocodeId(promocode.id);
+    setIsEditMode(true);
+    setIsDialogOpen(true);
   };
 
   const deletePromocode = (promocodeId: number) => {
@@ -168,8 +199,12 @@ const PromocodesSection = () => {
                 </DialogTrigger>
               <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="text-2xl font-heading">Новый промокод</DialogTitle>
-                  <DialogDescription>Добавьте промокод для пользователей</DialogDescription>
+                  <DialogTitle className="text-2xl font-heading">
+                    {isEditMode ? 'Редактировать промокод' : 'Новый промокод'}
+                  </DialogTitle>
+                  <DialogDescription>
+                    {isEditMode ? 'Измените информацию о промокоде' : 'Добавьте промокод для пользователей'}
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                   <div className="space-y-2">
@@ -254,7 +289,7 @@ const PromocodesSection = () => {
                   <Button variant="outline" onClick={resetForm}>Отмена</Button>
                   <Button onClick={addPromocode}>
                     <Icon name="Check" size={16} className="mr-2" />
-                    Добавить промокод
+                    {isEditMode ? 'Сохранить изменения' : 'Добавить промокод'}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -321,14 +356,24 @@ const PromocodesSection = () => {
                           {marketplaceNames[promo.marketplace]}
                         </Badge>
                         {isAdmin && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 text-destructive hover:text-destructive"
-                            onClick={() => deletePromocode(promo.id)}
-                          >
-                            <Icon name="Trash2" size={16} />
-                          </Button>
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              onClick={() => openEditDialog(promo)}
+                            >
+                              <Icon name="Pencil" size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-destructive hover:text-destructive"
+                              onClick={() => deletePromocode(promo.id)}
+                            >
+                              <Icon name="Trash2" size={16} />
+                            </Button>
+                          </>
                         )}
                       </div>
                       {isExpired && (
