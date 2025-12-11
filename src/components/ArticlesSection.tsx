@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import Icon from '@/components/ui/icon';
+import RichTextEditor from '@/components/RichTextEditor';
 
 export interface Article {
   id: number;
@@ -17,9 +17,7 @@ export interface Article {
   content: string;
   author: string;
   tags: string[];
-  imageUrl: string;
-  productLink?: string;
-  linkText?: string;
+  imageUrl?: string;
   createdAt: string;
 }
 
@@ -52,10 +50,7 @@ const ArticlesSection = () => {
     title: '',
     content: '',
     author: '',
-    tags: '',
-    imageUrl: '',
-    productLink: '',
-    linkText: ''
+    tags: ''
   });
 
   const addArticle = () => {
@@ -76,10 +71,7 @@ const ArticlesSection = () => {
               title: newArticle.title,
               content: newArticle.content,
               author: newArticle.author,
-              tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
-              imageUrl: newArticle.imageUrl || a.imageUrl,
-              productLink: newArticle.productLink,
-              linkText: newArticle.linkText
+              tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t)
             }
           : a
       );
@@ -96,9 +88,6 @@ const ArticlesSection = () => {
         content: newArticle.content,
         author: newArticle.author,
         tags: newArticle.tags.split(',').map(t => t.trim()).filter(t => t),
-        imageUrl: newArticle.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&h=400&fit=crop',
-        productLink: newArticle.productLink,
-        linkText: newArticle.linkText,
         createdAt: new Date().toISOString().split('T')[0]
       };
 
@@ -118,10 +107,7 @@ const ArticlesSection = () => {
       title: '',
       content: '',
       author: '',
-      tags: '',
-      imageUrl: '',
-      productLink: '',
-      linkText: ''
+      tags: ''
     });
     setIsDialogOpen(false);
     setIsEditMode(false);
@@ -133,10 +119,7 @@ const ArticlesSection = () => {
       title: article.title,
       content: article.content,
       author: article.author,
-      tags: article.tags.join(', '),
-      imageUrl: article.imageUrl,
-      productLink: article.productLink || '',
-      linkText: article.linkText || ''
+      tags: article.tags.join(', ')
     });
     setEditingArticleId(article.id);
     setIsEditMode(true);
@@ -153,70 +136,7 @@ const ArticlesSection = () => {
     });
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Ошибка',
-        description: 'Пожалуйста, выберите изображение',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: 'Ошибка',
-        description: 'Размер файла не должен превышать 5MB',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    setIsUploading(true);
-
-    try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64String = reader.result as string;
-        
-        const response = await fetch('https://functions.poehali.dev/0ef92614-8878-4eba-8d5c-99df6a2c1ef0', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            image: base64String,
-            filename: file.name
-          })
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setNewArticle({ ...newArticle, imageUrl: data.url });
-          toast({
-            title: 'Успешно!',
-            description: 'Изображение загружено'
-          });
-        } else {
-          throw new Error(data.error || 'Ошибка загрузки');
-        }
-      };
-
-      reader.readAsDataURL(file);
-    } catch (error) {
-      toast({
-        title: 'Ошибка',
-        description: 'Не удалось загрузить изображение',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const shareArticle = (articleId: number) => {
     const url = `${window.location.origin}/#article-${articleId}`;
@@ -264,13 +184,14 @@ const ArticlesSection = () => {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="article-content">Текст статьи *</Label>
-                  <Textarea
-                    id="article-content"
-                    placeholder="Основной текст статьи..."
-                    value={newArticle.content}
-                    onChange={(e) => setNewArticle({ ...newArticle, content: e.target.value })}
-                    rows={6}
+                  <RichTextEditor
+                    content={newArticle.content}
+                    onChange={(content) => setNewArticle({ ...newArticle, content })}
+                    placeholder="Начните писать статью... Используйте панель инструментов для форматирования, добавления изображений и ссылок на товары"
                   />
+                  <p className="text-xs text-muted-foreground">
+                    💡 Совет: Добавляйте изображения товаров и ссылки на маркетплейсы прямо в тексте
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="article-author">Автор *</Label>
@@ -290,69 +211,7 @@ const ArticlesSection = () => {
                     onChange={(e) => setNewArticle({ ...newArticle, tags: e.target.value })}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="article-image-upload">Загрузить изображение</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="article-image-upload"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                      className="cursor-pointer"
-                    />
-                    {isUploading && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Icon name="Loader2" size={16} className="animate-spin" />
-                        Загрузка...
-                      </div>
-                    )}
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Максимальный размер: 5MB. Форматы: JPG, PNG, GIF, WebP
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="article-image-url">Или укажите ссылку на изображение</Label>
-                  <Input
-                    id="article-image-url"
-                    type="url"
-                    placeholder="https://example.com/image.jpg"
-                    value={newArticle.imageUrl}
-                    onChange={(e) => setNewArticle({ ...newArticle, imageUrl: e.target.value })}
-                  />
-                  {newArticle.imageUrl && (
-                    <div className="mt-2">
-                      <img 
-                        src={newArticle.imageUrl} 
-                        alt="Preview" 
-                        className="w-full h-32 object-cover rounded-md"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="article-link">Ссылка на товар/сайт (опционально)</Label>
-                  <Input
-                    id="article-link"
-                    type="url"
-                    placeholder="https://example.com/product"
-                    value={newArticle.productLink}
-                    onChange={(e) => setNewArticle({ ...newArticle, productLink: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="article-link-text">Текст кнопки ссылки (опционально)</Label>
-                  <Input
-                    id="article-link-text"
-                    placeholder="Перейти к товару"
-                    value={newArticle.linkText}
-                    onChange={(e) => setNewArticle({ ...newArticle, linkText: e.target.value })}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Если не указано, будет "Перейти к товару"
-                  </p>
-                </div>
+
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={resetForm}>Отмена</Button>
@@ -431,7 +290,7 @@ const ArticlesSection = () => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="line-clamp-3 text-base">
-                  {article.content}
+                  {article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                 </CardDescription>
               </CardContent>
               <CardFooter className="flex flex-wrap gap-2">

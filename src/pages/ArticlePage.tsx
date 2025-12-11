@@ -6,22 +6,58 @@ import Icon from '@/components/ui/icon';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Article } from '@/components/ArticlesSection';
+import { useAuth } from '@/contexts/AuthContext';
+import RichTextEditor from '@/components/RichTextEditor';
+import { useToast } from '@/hooks/use-toast';
 
 const ArticlePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
+  const { toast } = useToast();
   const [article, setArticle] = useState<Article | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState('');
 
   useEffect(() => {
+    loadArticle();
+  }, [id]);
+
+  const loadArticle = () => {
     const articlesData = localStorage.getItem('articles');
     if (articlesData) {
       const articles: Article[] = JSON.parse(articlesData);
       const found = articles.find(a => a.id === Number(id));
       if (found) {
         setArticle(found);
+        setEditedContent(found.content);
       }
     }
-  }, [id]);
+  };
+
+  const handleSave = () => {
+    if (!article) return;
+
+    const articlesData = localStorage.getItem('articles');
+    if (articlesData) {
+      const articles: Article[] = JSON.parse(articlesData);
+      const updatedArticles = articles.map(a =>
+        a.id === article.id ? { ...a, content: editedContent } : a
+      );
+      localStorage.setItem('articles', JSON.stringify(updatedArticles));
+      setArticle({ ...article, content: editedContent });
+      setIsEditing(false);
+      toast({
+        title: 'Успешно!',
+        description: 'Статья обновлена'
+      });
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedContent(article?.content || '');
+    setIsEditing(false);
+  };
 
   if (!article) {
     return (
@@ -47,23 +83,38 @@ const ArticlePage = () => {
       
       <article className="container py-8 px-4">
         <div className="max-w-4xl mx-auto">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
-            className="mb-6"
-          >
-            <Icon name="ArrowLeft" size={16} className="mr-2" />
-            Назад к статьям
-          </Button>
+          <div className="flex justify-between items-center mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate('/')}
+            >
+              <Icon name="ArrowLeft" size={16} className="mr-2" />
+              Назад к статьям
+            </Button>
+            {isAdmin && (
+              <div className="flex gap-2">
+                {isEditing ? (
+                  <>
+                    <Button variant="outline" onClick={handleCancel}>
+                      <Icon name="X" size={16} className="mr-2" />
+                      Отмена
+                    </Button>
+                    <Button onClick={handleSave}>
+                      <Icon name="Check" size={16} className="mr-2" />
+                      Сохранить
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={() => setIsEditing(true)}>
+                    <Icon name="Pencil" size={16} className="mr-2" />
+                    Редактировать
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="bg-card rounded-lg overflow-hidden shadow-lg">
-            {article.imageUrl && (
-              <img 
-                src={article.imageUrl} 
-                alt={article.title}
-                className="w-full h-64 md:h-96 object-cover"
-              />
-            )}
             
             <div className="p-6 md:p-8">
               <div className="mb-4">
@@ -97,21 +148,19 @@ const ArticlePage = () => {
                 )}
               </div>
 
-              <div className="prose prose-lg max-w-none">
-                <p className="text-lg leading-relaxed whitespace-pre-wrap">
-                  {article.content}
-                </p>
-              </div>
-
-              {article.productLink && (
-                <div className="mt-8 pt-6 border-t">
-                  <Button asChild size="lg" className="w-full sm:w-auto">
-                    <a href={article.productLink} target="_blank" rel="noopener noreferrer">
-                      <Icon name="ExternalLink" size={18} className="mr-2" />
-                      {article.linkText || 'Перейти к товару'}
-                    </a>
-                  </Button>
+              {isEditing ? (
+                <div className="mt-6">
+                  <RichTextEditor
+                    content={editedContent}
+                    onChange={setEditedContent}
+                    placeholder="Редактируйте статью..."
+                  />
                 </div>
+              ) : (
+                <div 
+                  className="prose prose-lg max-w-none mt-6"
+                  dangerouslySetInnerHTML={{ __html: article.content }}
+                />
               )}
             </div>
           </div>
