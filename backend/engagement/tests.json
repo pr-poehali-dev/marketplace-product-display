@@ -1,0 +1,56 @@
+{
+  "tests": [
+    {
+      "name": "Add comment to article",
+      "method": "POST",
+      "path": "/?action=comment",
+      "body": {
+        "article_id": 1,
+        "author_name": "Test User",
+        "content": "Great article!",
+        "visitor_fingerprint": "test-fp-123"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "comment_id": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get article comments",
+      "method": "GET",
+      "path": "/?action=comments&article_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "comments": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Like article",
+      "method": "POST",
+      "path": "/?action=like",
+      "body": {
+        "article_id": 1,
+        "visitor_fingerprint": "test-fp-456"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get article likes",
+      "method": "GET",
+      "path": "/?action=likes&article_id=1&visitor_fingerprint=test-fp-456",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "total_likes": "number",
+        "user_liked": "boolean"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

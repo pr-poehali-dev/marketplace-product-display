@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "Track page visit",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "page_path": "/article/1",
+        "visitor_fingerprint": "test-fingerprint-123",
+        "admin_fingerprint": "admin-fingerprint"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get page statistics",
+      "method": "GET",
+      "path": "/?page_path=/article/1&admin_fingerprint=admin-fingerprint",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "page_path": "string",
+        "unique_visitors": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

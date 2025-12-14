@@ -9,6 +9,8 @@ import { Article } from '@/components/ArticlesSection';
 import { useAuth } from '@/contexts/AuthContext';
 import RichTextEditor from '@/components/RichTextEditor';
 import { useToast } from '@/hooks/use-toast';
+import ArticleComments from '@/components/ArticleComments';
+import { generateFingerprint, getAdminFingerprint } from '@/utils/fingerprint';
 
 const ArticlePage = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +23,27 @@ const ArticlePage = () => {
 
   useEffect(() => {
     loadArticle();
+    trackPageVisit();
   }, [id]);
+
+  const trackPageVisit = async () => {
+    try {
+      const visitorFingerprint = generateFingerprint();
+      const adminFingerprint = getAdminFingerprint();
+      
+      await fetch('https://functions.poehali.dev/a8d029f8-e71d-46d6-92e2-4268e73be8cd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          page_path: `/article/${id}`,
+          visitor_fingerprint: visitorFingerprint,
+          admin_fingerprint: adminFingerprint
+        })
+      });
+    } catch (error) {
+      console.error('Failed to track visit:', error);
+    }
+  };
 
   const loadArticle = () => {
     const articlesData = localStorage.getItem('articles');
@@ -163,6 +185,11 @@ const ArticlePage = () => {
                 />
               )}
             </div>
+          </div>
+
+          {/* Комментарии и лайки */}
+          <div className="mt-8">
+            <ArticleComments articleId={article.id} isAdmin={isAdmin} />
           </div>
         </div>
       </article>
