@@ -151,13 +151,6 @@ const ArticlesSection = () => {
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-blue-50/30 via-white to-purple-50/30">
       <div className="container">
-        {/* Панель аналитики для админа */}
-        {isAdmin && (
-          <div className="mb-8">
-            <AnalyticsPanel />
-          </div>
-        )}
-
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h3 className="text-2xl sm:text-3xl font-bold font-heading mb-2">Статьи о товарах</h3>

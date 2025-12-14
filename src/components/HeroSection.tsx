@@ -17,7 +17,7 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
             Shop Sage
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
-            ShopSage — это современная онлайн-платформа, предназначенная для предоставления широкого ассортимента товаров и услуг. Сайт ориентирован на удобство пользователей, предлагая интуитивно понятный интерфейс и разнообразные возможности для поиска и приобретения продукции на всех известных маркетплейсах ( Ozon, WB, Яндекс Маркет )
+            ShopSage — это современная онлайн-платформа, предназначенная для предоставления широкого ассортимента товаров и услуг. Сайт ориентирован на удобство пользователей, предлагая интуитивно понятный интерфейс и разнообразные возможности для поиска и приобретения продукции на всех известных маркетплейсах
           </p>
           <div className="flex flex-col sm:flex-row items-center gap-2 max-w-2xl mx-auto">
             <div className="relative flex-1 w-full">
@@ -38,10 +38,6 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
             <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
               <Icon name="Package" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
               1000+ товаров
-            </Badge>
-            <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
-              <Icon name="Store" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
-              3 маркетплейса
             </Badge>
             <Badge variant="secondary" className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
               <Icon name="Zap" size={14} className="mr-1 sm:mr-2 sm:w-4 sm:h-4" />
