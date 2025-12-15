@@ -88,6 +88,38 @@ const ArticlePage = () => {
     setIsEditing(false);
   };
 
+  const handleShare = (platform: string) => {
+    if (!article) return;
+    
+    const url = window.location.href;
+    const text = `${article.title} - Shop Sage`;
+    
+    let shareUrl = '';
+    
+    switch(platform) {
+      case 'vk':
+        shareUrl = `https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+        break;
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(url);
+        toast({
+          title: 'Скопировано!',
+          description: 'Ссылка скопирована в буфер обмена'
+        });
+        return;
+    }
+    
+    if (shareUrl) {
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+  };
+
   const handleLike = () => {
     if (!article) return;
     
@@ -213,15 +245,56 @@ const ArticlePage = () => {
                   </Button>
                 </div>
 
-                {article.tags && article.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {article.tags.map((tag, index) => (
-                      <Badge key={index} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  {article.tags && article.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {article.tags.map((tag, index) => (
+                        <Badge key={index} variant="secondary">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center gap-2 ml-auto">
+                    <span className="text-sm text-muted-foreground mr-2">Поделиться:</span>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleShare('vk')}
+                      title="ВКонтакте"
+                    >
+                      <Icon name="Share2" size={14} className="mr-1" />
+                      VK
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleShare('telegram')}
+                      title="Telegram"
+                    >
+                      <Icon name="Send" size={14} className="mr-1" />
+                      TG
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleShare('whatsapp')}
+                      title="WhatsApp"
+                    >
+                      <Icon name="MessageCircle" size={14} className="mr-1" />
+                      WA
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleShare('copy')}
+                      title="Скопировать ссылку"
+                    >
+                      <Icon name="Copy" size={14} />
+                    </Button>
                   </div>
-                )}
+                </div>
               </div>
 
               {isEditing ? (
