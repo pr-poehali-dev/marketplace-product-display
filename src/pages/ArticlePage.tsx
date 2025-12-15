@@ -20,6 +20,7 @@ const ArticlePage = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState('');
+  const [hasLiked, setHasLiked] = useState(false);
 
   useEffect(() => {
     loadArticle();
@@ -51,8 +52,14 @@ const ArticlePage = () => {
       const articles: Article[] = JSON.parse(articlesData);
       const found = articles.find(a => a.id === Number(id));
       if (found) {
-        setArticle(found);
-        setEditedContent(found.content);
+        const updatedArticle = { ...found, views: (found.views || 0) + 1 };
+        const updatedArticles = articles.map(a => a.id === updatedArticle.id ? updatedArticle : a);
+        localStorage.setItem('articles', JSON.stringify(updatedArticles));
+        setArticle(updatedArticle);
+        setEditedContent(updatedArticle.content);
+        
+        const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '[]');
+        setHasLiked(likedArticles.includes(updatedArticle.id));
       }
     }
   };
@@ -79,6 +86,40 @@ const ArticlePage = () => {
   const handleCancel = () => {
     setEditedContent(article?.content || '');
     setIsEditing(false);
+  };
+
+  const handleLike = () => {
+    if (!article) return;
+    
+    const likedArticles = JSON.parse(localStorage.getItem('likedArticles') || '[]');
+    const articlesData = localStorage.getItem('articles');
+    
+    if (articlesData) {
+      const articles: Article[] = JSON.parse(articlesData);
+      let updatedArticles;
+      
+      if (hasLiked) {
+        updatedArticles = articles.map(a => 
+          a.id === article.id ? { ...a, likes: Math.max((a.likes || 0) - 1, 0) } : a
+        );
+        const newLikedArticles = likedArticles.filter((id: number) => id !== article.id);
+        localStorage.setItem('likedArticles', JSON.stringify(newLikedArticles));
+        setHasLiked(false);
+      } else {
+        updatedArticles = articles.map(a => 
+          a.id === article.id ? { ...a, likes: (a.likes || 0) + 1 } : a
+        );
+        likedArticles.push(article.id);
+        localStorage.setItem('likedArticles', JSON.stringify(likedArticles));
+        setHasLiked(true);
+      }
+      
+      localStorage.setItem('articles', JSON.stringify(updatedArticles));
+      const updatedArticle = updatedArticles.find(a => a.id === article.id);
+      if (updatedArticle) {
+        setArticle(updatedArticle);
+      }
+    }
   };
 
   if (!article) {
@@ -157,6 +198,19 @@ const ArticlePage = () => {
                       day: 'numeric'
                     })}</span>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Eye" size={16} />
+                    <span>{article.views || 0} просмотров</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={handleLike}
+                    className={hasLiked ? 'text-red-500' : ''}
+                  >
+                    <Icon name="Heart" size={16} className="mr-1" fill={hasLiked ? 'currentColor' : 'none'} />
+                    <span>{article.likes || 0}</span>
+                  </Button>
                 </div>
 
                 {article.tags && article.tags.length > 0 && (

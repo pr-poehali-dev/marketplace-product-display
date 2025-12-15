@@ -12,12 +12,16 @@ interface AuthContextType {
   login: (email: string, password: string) => boolean;
   register: (email: string, password: string) => boolean;
   logout: () => void;
+  updateAdminCredentials: (newEmail: string, newPassword: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const ADMIN_EMAIL = 'admin';
 const ADMIN_PASSWORD = 'admin123';
+
+const getAdminEmail = () => localStorage.getItem('adminEmail') || ADMIN_EMAIL;
+const getAdminPassword = () => localStorage.getItem('adminPassword') || ADMIN_PASSWORD;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -55,8 +59,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = (email: string, password: string): boolean => {
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      const adminUser: User = { email: ADMIN_EMAIL, role: 'admin' };
+    const adminEmail = getAdminEmail();
+    const adminPassword = getAdminPassword();
+    
+    if (email === adminEmail && password === adminPassword) {
+      const adminUser: User = { email: adminEmail, role: 'admin' };
       setUser(adminUser);
       setIsAuthenticated(true);
       localStorage.setItem('currentUser', JSON.stringify(adminUser));
@@ -83,6 +90,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('currentUser');
   };
 
+  const updateAdminCredentials = (newEmail: string, newPassword: string): boolean => {
+    if (!user || user.email !== ADMIN_EMAIL) {
+      return false;
+    }
+    
+    if (!newEmail || !newPassword || newPassword.length < 6) {
+      return false;
+    }
+    
+    localStorage.setItem('adminEmail', newEmail);
+    localStorage.setItem('adminPassword', newPassword);
+    
+    const updatedUser: User = { email: newEmail, role: 'admin' };
+    setUser(updatedUser);
+    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+    
+    return true;
+  };
+
   return (
     <AuthContext.Provider value={{ 
       isAuthenticated, 
@@ -90,7 +116,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAdmin: user?.role === 'admin',
       login, 
       register,
-      logout 
+      logout,
+      updateAdminCredentials
     }}>
       {children}
     </AuthContext.Provider>

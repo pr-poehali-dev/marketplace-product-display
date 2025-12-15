@@ -28,7 +28,7 @@ interface UsersStorage {
 }
 
 const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateAdminCredentials } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
   const [users, setUsers] = useState<UsersStorage>({});
@@ -49,6 +49,59 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
   };
 
   const handleChangePassword = () => {
+    if (user?.email === 'admin') {
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        toast({
+          title: 'Ошибка',
+          description: 'Заполните все поля',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (newPassword.length < 6) {
+        toast({
+          title: 'Ошибка',
+          description: 'Новый пароль должен быть не менее 6 символов',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        toast({
+          title: 'Ошибка',
+          description: 'Пароли не совпадают',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const success = updateAdminCredentials(currentPassword, newPassword);
+      
+      if (success) {
+        toast({
+          title: 'Успешно!',
+          description: 'Логин и пароль администратора изменены'
+        });
+        
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        
+        setTimeout(() => {
+          logout();
+        }, 2000);
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: 'Не удалось обновить данные',
+          variant: 'destructive'
+        });
+      }
+      return;
+    }
+
     if (!currentPassword || !newPassword || !confirmPassword) {
       toast({
         title: 'Ошибка',
@@ -71,15 +124,6 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
       toast({
         title: 'Ошибка',
         description: 'Пароли не совпадают',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (user?.email === 'admin') {
-      toast({
-        title: 'Внимание',
-        description: 'Пароль главного админа нельзя изменить через интерфейс',
         variant: 'destructive'
       });
       return;
@@ -179,13 +223,25 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
               </CardContent>
             </Card>
 
-            {user?.email !== 'admin' && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Сменить пароль</CardTitle>
-                  <CardDescription>Измените пароль вашего аккаунта</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Сменить {user?.email === 'admin' ? 'логин и пароль' : 'пароль'}</CardTitle>
+                <CardDescription>Измените данные для входа в аккаунт</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {user?.email === 'admin' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="new-email">Новый логин</Label>
+                    <Input
+                      id="new-email"
+                      type="text"
+                      placeholder="Введите новый логин"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                    />
+                  </div>
+                )}
+                {user?.email !== 'admin' && (
                   <div className="space-y-2">
                     <Label htmlFor="current-password">Текущий пароль</Label>
                     <Input
@@ -195,31 +251,31 @@ const AdminSettings = ({ isOpen, onClose }: AdminSettingsProps) => {
                       onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-password">Новый пароль</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Подтвердите новый пароль</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                    />
-                  </div>
-                  <Button onClick={handleChangePassword} className="w-full">
-                    <Icon name="Key" size={16} className="mr-2" />
-                    Изменить пароль
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
+                )}
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Новый пароль</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Подтвердите новый пароль</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+                <Button onClick={handleChangePassword} className="w-full">
+                  <Icon name="Key" size={16} className="mr-2" />
+                  Изменить {user?.email === 'admin' ? 'данные' : 'пароль'}
+                </Button>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>

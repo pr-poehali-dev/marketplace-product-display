@@ -13,8 +13,8 @@ const HeroSection = ({ searchQuery, setSearchQuery }: HeroSectionProps) => {
     <section id="home" className="py-12 sm:py-20 px-4">
       <div className="container">
         <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8 animate-fade-in">
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-primary leading-tight">
-            Shop Sage
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold font-heading text-primary leading-tight relative">
+            Shop Sage <span className="inline-block animate-bounce">🎄</span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4">
             ShopSage — это современная онлайн-платформа, предназначенная для предоставления широкого ассортимента товаров и услуг. Сайт ориентирован на удобство пользователей, предлагая интуитивно понятный интерфейс и разнообразные возможности для поиска и приобретения продукции на всех известных маркетплейсах

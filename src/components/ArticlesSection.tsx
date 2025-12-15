@@ -20,6 +20,8 @@ export interface Article {
   tags: string[];
   imageUrl?: string;
   createdAt: string;
+  likes?: number;
+  views?: number;
 }
 
 const mockArticles: Article[] = [
@@ -30,7 +32,9 @@ const mockArticles: Article[] = [
     author: 'Admin',
     tags: ['Наушники', 'Гайды', 'Электроника'],
     imageUrl: 'https://images.unsplash.com/photo-1590658165737-15a047b7a0b5?w=800&h=400&fit=crop',
-    createdAt: '2024-11-20'
+    createdAt: '2024-11-20',
+    likes: 0,
+    views: 0
   }
 ];
 
@@ -290,9 +294,19 @@ const ArticlesSection = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <CardDescription className="line-clamp-3 text-base">
+                <CardDescription className="line-clamp-3 text-base mb-4">
                   {article.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                 </CardDescription>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Icon name="Eye" size={16} />
+                    <span>{article.views || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Icon name="Heart" size={16} />
+                    <span>{article.likes || 0}</span>
+                  </div>
+                </div>
               </CardContent>
               <CardFooter className="flex flex-wrap gap-2">
                 {article.tags.map((tag, idx) => (
